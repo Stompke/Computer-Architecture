@@ -14,18 +14,20 @@ if filename:
     with open(filename) as f:
         for address, line in enumerate(f):
             line = line.split('#')
-
+            # print(line)
             try:
-                v = int(line[0])
+                v = line[0].strip()
+                # v = '0b' + v
+                v = int(v, 2)
                 clean_file.append(v)
             except ValueError:
                 continue
             # memory[address] = v
-            print(v)
-
+            # print(v)
+# print(clean_file)
 cpu = CPU()
 # print('clean file', clean_file)
-cpu.load()
-print(cpu.ram)
+cpu.load(clean_file)
+# print(cpu.ram)
 cpu.run()
 sys.exit(0)

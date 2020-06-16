@@ -13,9 +13,11 @@ hard_code_program = [
 ]
 
 
-LDI = 0b10000010
-PRN = 0b01000111
-HLT = 0b00000001
+
+
+
+
+
 
 class CPU:
     """Main CPU class."""
@@ -87,26 +89,62 @@ class CPU:
     def run(self):
         """Run the CPU."""
 
+        def LDI(operand_a, operand_b):
+            self.register[operand_a] = operand_b
+            self.pc += 3
+
+        def PRN(operand_a, operand_b):
+            print(self.register[operand_a])
+            self.pc += 2
+
+        def MUL(operand_a, operand_b):
+            self.register[operand_a] = self.register[operand_a] * self.register[operand_b]
+            self.pc += 3
+
+        def HLT(operand_a, operand_b):
+            self.running = False
+
+        
+        branch_table = {
+            0b10000010 : LDI,
+            0b01000111 : PRN,
+            0b00000001 : HLT,
+            0b10100010 : MUL
+        }
+
+
         while self.running:
             IR = self.ram[self.pc]
+            # print('pc', self.pc)
+            # print('register', self.register)
+            # if 0b10000010 == IR:
+            #     print('IR', IR)
+            #     print('its the same...')
+            # else:
+            #     print('IR', IR)
+            #     print('not equal.....')
             operand_a = self.ram[self.pc + 1]
             operand_b = self.ram[self.pc + 2]
 
+            branch_table[IR](operand_a, operand_b)
+            
 
-            if IR == LDI: # LDI
-                self.register[operand_a] = operand_b
-                self.pc += 3
+            
 
-            elif IR == PRN: # PRN
-                print(self.register[operand_a])
-                self.pc += 2
+            # if IR == LDI: # LDI
+            #     self.register[operand_a] = operand_b
+            #     self.pc += 3
+
+            # elif IR == PRN: # PRN
+            #     print(self.register[operand_a])
+            #     self.pc += 2
 
 
-            elif IR == HLT: #HLT
-                self.running = False
+            # elif IR == HLT: #HLT
+            #     self.running = False
 
-            else:
-                print('whattt is thatt?', self.pc)
-                print('IR', IR)
-                self.pc += 1
-                continue
+            # else:
+            #     print('whattt is thatt?', self.pc)
+            #     print('IR', IR)
+            #     self.pc += 1
+            #     continue
