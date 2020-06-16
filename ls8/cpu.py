@@ -2,6 +2,17 @@
 
 import sys
 
+hard_code_program = [
+    # From print8.ls8
+    0b10000010, # LDI R0,8
+    0b00000000,
+    0b00001000,
+    0b01000111, # PRN R0
+    0b00000000,
+    0b00000001, # HLT
+]
+
+
 LDI = 0b10000010
 PRN = 0b01000111
 HLT = 0b00000001
@@ -22,14 +33,14 @@ class CPU:
     def ram_write(self, MDR, MAR):
         self.ram[MAR] = MDR
 
-    def load(self):
+    def load(self, file = hard_code_program):
         """Load a program into memory."""
 
         address = 0
 
         # For now, we've just hardcoded a program:
 
-        program = [
+        hard_code_program = [
             # From print8.ls8
             0b10000010, # LDI R0,8
             0b00000000,
@@ -39,7 +50,7 @@ class CPU:
             0b00000001, # HLT
         ]
 
-        for instruction in program:
+        for instruction in file:
             self.ram[address] = instruction
             address += 1
 
@@ -93,3 +104,9 @@ class CPU:
 
             elif IR == HLT: #HLT
                 self.running = False
+
+            else:
+                print('whattt is thatt?', self.pc)
+                print('IR', IR)
+                self.pc += 1
+                continue
