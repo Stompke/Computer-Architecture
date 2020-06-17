@@ -12,13 +12,6 @@ hard_code_program = [
     0b00000001, # HLT
 ]
 
-
-
-
-
-
-
-
 class CPU:
     """Main CPU class."""
 
@@ -88,6 +81,11 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
+        # Power Up
+        pc = 0
+        SP = 7
+        self.register[SP] = 0xf4
+        self.running = True
 
         def LDI(operand_a, operand_b):
             self.register[operand_a] = operand_b
@@ -103,13 +101,24 @@ class CPU:
 
         def HLT(operand_a, operand_b):
             self.running = False
-
+        
+        def PUSH(operand_a, operand_b):
+            self.register[SP] -= 1
+            self.ram[self.register[SP]] = self.register[operand_a]
+            self.pc += 2
+        
+        def POP(operand_a, operand_b):
+            self.register[operand_a] = self.ram[self.register[SP]]
+            self.register[SP] += 1
+            self.pc += 2
         
         branch_table = {
             0b10000010 : LDI,
             0b01000111 : PRN,
             0b00000001 : HLT,
-            0b10100010 : MUL
+            0b10100010 : MUL,
+            0b01000101 : PUSH,
+            0b01000110 : POP
         }
 
 
