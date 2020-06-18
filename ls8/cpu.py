@@ -156,7 +156,7 @@ class CPU:
         while self.running:
             try:
                 IR = self.ram[self.pc]
-                # print('in try: ', IR)
+                print('in try: ', bin(IR))
                 operand_a = self.ram[self.pc + 1]
                 operand_b = self.ram[self.pc + 2]
 
