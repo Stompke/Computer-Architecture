@@ -82,16 +82,18 @@ class CPU:
     def run(self):
         """Run the CPU."""
         # Power Up
-        pc = 0
-        SP = 7
+        # pc = 0
+        SP = 7 # Stack Pointer
         self.register[SP] = 0xf4
         self.running = True
 
         def LDI(operand_a, operand_b):
+            # print('LDI ran...')
             self.register[operand_a] = operand_b
             self.pc += 3
 
         def PRN(operand_a, operand_b):
+            # print('PRN ran...')
             print(self.register[operand_a])
             self.pc += 2
 
@@ -111,49 +113,56 @@ class CPU:
             self.register[operand_a] = self.ram[self.register[SP]]
             self.register[SP] += 1
             self.pc += 2
-        
+
+        def CALL(operand_a, operand_b):
+            # print('Call ran...')
+            return_address = self.pc + 2
+            # print('return address: ', return_address)
+
+            self.register[SP] -= 1
+            self.ram[self.register[SP]] = return_address
+
+
+            reg_num = self.ram[self.pc+1]
+            subroutine_address = self.register[reg_num]
+
+            self.pc = subroutine_address
+
+        def RET(operand_a, operand_b):
+            # print('RET ran...')
+            # print('before set pc: ', self.pc)
+            self.pc = self.ram[self.register[SP]]
+            # print('after set pc: ', self.pc)
+            self.register[SP] += 1
+
+
+        def ADD(operand_a, operand_b):
+            self.register[operand_a] = self.register[operand_a] + self.register[operand_a]
+            self.pc += 3
+
         branch_table = {
             0b10000010 : LDI,
             0b01000111 : PRN,
             0b00000001 : HLT,
             0b10100010 : MUL,
             0b01000101 : PUSH,
-            0b01000110 : POP
+            0b01000110 : POP,
+            0b01010000 : CALL,
+            0b00010001 : RET,
+            0b10100000 : ADD
         }
 
 
         while self.running:
-            IR = self.ram[self.pc]
-            # print('pc', self.pc)
-            # print('register', self.register)
-            # if 0b10000010 == IR:
-            #     print('IR', IR)
-            #     print('its the same...')
-            # else:
-            #     print('IR', IR)
-            #     print('not equal.....')
-            operand_a = self.ram[self.pc + 1]
-            operand_b = self.ram[self.pc + 2]
+            try:
+                IR = self.ram[self.pc]
+                # print('in try: ', IR)
+                operand_a = self.ram[self.pc + 1]
+                operand_b = self.ram[self.pc + 2]
 
-            branch_table[IR](operand_a, operand_b)
+                branch_table[IR](operand_a, operand_b)
+            except:
+                print('broke here PC: ', self.pc)
+                print('broke here IR: ', IR)
+                break
             
-
-            
-
-            # if IR == LDI: # LDI
-            #     self.register[operand_a] = operand_b
-            #     self.pc += 3
-
-            # elif IR == PRN: # PRN
-            #     print(self.register[operand_a])
-            #     self.pc += 2
-
-
-            # elif IR == HLT: #HLT
-            #     self.running = False
-
-            # else:
-            #     print('whattt is thatt?', self.pc)
-            #     print('IR', IR)
-            #     self.pc += 1
-            #     continue
