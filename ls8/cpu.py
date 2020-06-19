@@ -142,16 +142,39 @@ class CPU:
             self.PC += 3
 
         def CMP(operand_a, operand_b):
-            if (operand_a == operand_b):
+            if (self.register[operand_a] == self.register[operand_b]):
+                # print('set flag to equal')
                 self.FL = 0b00000001
-            elif (operand_a < operand_b):
+            elif (self.register[operand_a] < self.register[operand_b]):
+                # print('set flag to less than')
                 self.FL = 0b00000100
-            elif (operand_a > operand_b):
+            elif (self.register[operand_a] > self.register[operand_b]):
+                # print('set flag to greater than')
                 self.FL = 0b00000010
             self.PC += 3
 
         def JMP(operand_a, operand_b):
             self.PC = self.register[operand_a]
+
+        def JEQ(operand_a, operand_b):
+            # print('FL: ', self.FL)
+            if(self.FL == 0b00000001):
+                # print('JEQ: its equal! jump!')
+                self.PC = self.register[operand_a]
+            else:
+                # print('JEQ: its not equal! DONT jump!')
+                self.PC += 2
+        def JNE(operand_a, operand_b):
+            # print('FL: ', self.FL)
+            total = self.FL & 0b00000001
+            if (total == 0):
+                # print('JNE: its not equal! JUMP!')
+                # print('jumping to: ', self.register[operand_a])
+                self.PC = self.register[operand_a]
+            else:
+                # print('JNE: its not equal! DONT jump!')
+                self.PC += 2
+
 
         branch_table = {
             0b10000010 : LDI,
@@ -164,7 +187,9 @@ class CPU:
             0b00010001 : RET,
             0b10100000 : ADD,
             0b10100111 : CMP,
-            0b01010100 : JMP
+            0b01010100 : JMP,
+            0b01010101 : JEQ,
+            0b01010110 : JNE
 
         }
 
