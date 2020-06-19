@@ -18,9 +18,10 @@ class CPU:
     def __init__(self):
         """Construct a new CPU."""
         self.ram = [0] * 256
-        self.pc = 0
+        self.PC = 0
         self.running = True
         self.register = [0] * 8 
+        self.FL = 0b00000000
     
     def ram_read(self, MAR):
         return self.ram[MAR]
@@ -66,12 +67,12 @@ class CPU:
         """
 
         print(f"TRACE: %02X | %02X %02X %02X |" % (
-            self.pc,
+            self.PC,
             #self.fl,
             #self.ie,
-            self.ram_read(self.pc),
-            self.ram_read(self.pc + 1),
-            self.ram_read(self.pc + 2)
+            self.ram_read(self.PC),
+            self.ram_read(self.PC + 1),
+            self.ram_read(self.PC + 2)
         ), end='')
 
         for i in range(8):
@@ -82,7 +83,7 @@ class CPU:
     def run(self):
         """Run the CPU."""
         # Power Up
-        # pc = 0
+        # PC = 0
         SP = 7 # Stack Pointer
         self.register[SP] = 0xf4
         self.running = True
@@ -90,16 +91,16 @@ class CPU:
         def LDI(operand_a, operand_b):
             # print('LDI ran...')
             self.register[operand_a] = operand_b
-            self.pc += 3
+            self.PC += 3
 
         def PRN(operand_a, operand_b):
             # print('PRN ran...')
             print(self.register[operand_a])
-            self.pc += 2
+            self.PC += 2
 
         def MUL(operand_a, operand_b):
             self.register[operand_a] = self.register[operand_a] * self.register[operand_b]
-            self.pc += 3
+            self.PC += 3
 
         def HLT(operand_a, operand_b):
             self.running = False
@@ -107,38 +108,38 @@ class CPU:
         def PUSH(operand_a, operand_b):
             self.register[SP] -= 1
             self.ram[self.register[SP]] = self.register[operand_a]
-            self.pc += 2
+            self.PC += 2
         
         def POP(operand_a, operand_b):
             self.register[operand_a] = self.ram[self.register[SP]]
             self.register[SP] += 1
-            self.pc += 2
+            self.PC += 2
 
         def CALL(operand_a, operand_b):
             # print('Call ran...')
-            return_address = self.pc + 2
+            return_address = self.PC + 2
             # print('return address: ', return_address)
 
             self.register[SP] -= 1
             self.ram[self.register[SP]] = return_address
 
 
-            reg_num = self.ram[self.pc+1]
+            reg_num = self.ram[self.PC+1]
             subroutine_address = self.register[reg_num]
 
-            self.pc = subroutine_address
+            self.PC = subroutine_address
 
         def RET(operand_a, operand_b):
             # print('RET ran...')
-            # print('before set pc: ', self.pc)
-            self.pc = self.ram[self.register[SP]]
-            # print('after set pc: ', self.pc)
+            # print('before set PC: ', self.PC)
+            self.PC = self.ram[self.register[SP]]
+            # print('after set PC: ', self.PC)
             self.register[SP] += 1
 
 
         def ADD(operand_a, operand_b):
             self.register[operand_a] = self.register[operand_a] + self.register[operand_a]
-            self.pc += 3
+            self.PC += 3
 
         branch_table = {
             0b10000010 : LDI,
@@ -155,14 +156,14 @@ class CPU:
 
         while self.running:
             try:
-                IR = self.ram[self.pc]
-                print('in try: ', bin(IR))
-                operand_a = self.ram[self.pc + 1]
-                operand_b = self.ram[self.pc + 2]
+                IR = self.ram[self.PC]
+                # print('in try: ', bin(IR))
+                operand_a = self.ram[self.PC + 1]
+                operand_b = self.ram[self.PC + 2]
 
                 branch_table[IR](operand_a, operand_b)
             except:
-                print('broke here PC: ', self.pc)
-                print('broke here IR: ', IR)
+                # print('broke here PC: ', self.PC)
+                # print('broke here IR: ', IR)
                 break
             
