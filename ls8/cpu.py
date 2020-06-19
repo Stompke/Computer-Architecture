@@ -138,7 +138,7 @@ class CPU:
 
 
         def ADD(operand_a, operand_b):
-            self.register[operand_a] = self.register[operand_a] + self.register[operand_a]
+            self.register[operand_a] = self.register[operand_a] + self.register[operand_b]
             self.PC += 3
 
         def CMP(operand_a, operand_b):
@@ -148,6 +148,7 @@ class CPU:
                 self.FL = 0b00000100
             elif (operand_a > operand_b):
                 self.FL = 0b00000010
+            self.PC += 3
 
         branch_table = {
             0b10000010 : LDI,
